@@ -61,6 +61,50 @@ class ListLink:
 
         antelement.next = copyfirst #se o valor do copyfirst.next não for None , a variavel .next do anteriro deve apontar para o objeto seguinte do indice a ser removido
         self.SIZE -= 1
+        return
+
+   def remuve(self):
+     if self.isEmpyt() == True: 
+         print("lsita esta Vazia")
+         return 
+     copyfirst = self.first
+     for itens in range(self.size() - 2):         # O laço de repetição precisa ser menos 2 pos diferente do anterior esse se baseioa mno indice do size
+            copyfirst = copyfirst.next            # então inicia do 1 e não do 0 
+                                              #recebe valor do primeiro
+     returnforusse = copyfirst.next 
+     copyfirst.next = None
+     return returnforusse
+
+   def addinlista(self , content , Id_locate):
+        copyfirst = self.first
+        
+        if Id_locate == 1:                
+            self.first = node(content)
+            self.first.next = copyfirst
+            return
+        
+        for itens in range(Id_locate -2): # anda com o copyfirt ate o indice anterior ao idice 
+            copyfirst = copyfirst.next
+        
+        antelement = copyfirst
+        
+        if Id_locate == self.size():
+            
+            for itens in range(1):         #percorre ate o proximo valor depois do indice 
+             copyfirst = copyfirst.next
+            antelement.next = node(content)
+            antelement.next.next = copyfirst
+            self.SIZE += 1
+            return        
+        
+        for itens in range(2):         #percorre ate o proximo valor depois do indice 
+            copyfirst = copyfirst.next
+        antelement.next = node(content)
+        antelement.next.next = copyfirst
+        self.SIZE += 1
+        return    
+       
+
 
 lista = ListLink()
 lista.insert("casa")  
@@ -68,7 +112,7 @@ lista.insert("carro")
 lista.insert("pessoa")    
 lista.insert("cachorro")        
 lista.insert("drogas")    
-lista.printlist()
-print()
-lista.remuvelement(3)
+lista.addinlista("git" , 5)
+#print(lista.remuve())
+#lista.remuvelement(3)
 lista.printlist()
