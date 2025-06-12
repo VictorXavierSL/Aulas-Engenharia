@@ -3,6 +3,7 @@ import math
 import random
 import heapq
 import time
+
 class Edge:
     def __init__(self, target, weight):
         self.target = target
@@ -115,8 +116,8 @@ RELOGIO = pygame.time.Clock()
 BRANCO, PRETO, AZUL, VERMELHO = (255, 255, 255), (0, 0, 0), (0, 100, 255), (255, 50, 50)
 CINZA, VERDE, AMARELO, LARANJA_RESET = (180, 180, 180), (50, 200, 50), (255, 200, 0), (255, 140, 0)
 RAIO_NO, PONTOS_DE_ACAO_MAX = 20, 10
-RODADAS_MAX = 4
-
+RODADAS_MAX = 6
+Vitorias = 0
 # --- Classe do Personagem ---
 class personagen:
     def __init__(self, Node, cor, graph):
@@ -189,7 +190,7 @@ def drawGraph(tela, graph):
         tela.blit(texto, texto.get_rect(center=(vertex.x, vertex.y)))
 
 
-def drawUI(tela, jogador, perseguidor, turno, mensagem, rodada):
+def drawUI(tela, jogador, perseguidor, turno, mensagem, rodada , Vitorias):
     pygame.draw.rect(tela, BRANCO, (0, ALTURA - 80, LARGURA, 80))
     pygame.draw.line(tela, PRETO, (0, ALTURA - 80), (LARGURA, ALTURA - 80), 3)
     tela.blit(FONTE_UI.render(f"Jogador PA: {jogador.custoMAX}", True, AZUL), (20, ALTURA - 60))
@@ -197,6 +198,7 @@ def drawUI(tela, jogador, perseguidor, turno, mensagem, rodada):
     tela.blit(FONTE_UI.render(f"Rodada: {rodada}/{RODADAS_MAX}", True, PRETO), (480, ALTURA-60))
     texto_turno = FONTE_UI.render("Sua Vez" if turno == 'jogador' else "Vez do Inimigo", True, VERDE if turno == 'jogador' else VERMELHO)
     tela.blit(texto_turno, texto_turno.get_rect(center=(LARGURA / 2 + 100, 40)))
+    tela.blit(FONTE_UI.render(f"Vitorias: {Vitorias}", True, PRETO), (LARGURA - 260, ALTURA - 700))
     if mensagem:
         cor_fundo = VERDE if "Vitória" in mensagem else PRETO
         pygame.draw.rect(tela, cor_fundo, (LARGURA/2 - 250, ALTURA/2 - 50, 500, 100), border_radius=15)
@@ -231,7 +233,7 @@ def iniciar_novo_jogo():
 # --- Loop Principal ---
 def main():
     graph, jogador, perseguidor, turno, mensagem_jogo, rodada_atual = iniciar_novo_jogo()
-    
+    Vitorias = 0
     rodando = True
     while rodando:
         for event in pygame.event.get():
@@ -257,9 +259,12 @@ def main():
                                 jogador.muve(vertex.name, custo, graph)
                             break
         
+
+        
         if turno == 'perseguidor' and not mensagem_jogo:
             pygame.time.delay(100)
             caminho = graph.findPath(perseguidor.no_atual, jogador.no_atual)
+            time.sleep(0.7)
             
             if perseguidor.custoMAX > 0 and caminho and len(caminho) > 1:
                 proximo_no = caminho[1]
@@ -279,9 +284,15 @@ def main():
                 perseguidor.resetPontosMuve()
 
         if not mensagem_jogo:
-            if jogador.no_atual in graph.winning_nodes: mensagem_jogo = "Você escapou! Vitória!"
-            elif jogador.no_atual == perseguidor.no_atual: mensagem_jogo = "Você foi apanhado! Fim de jogo."
-            elif rodada_atual > RODADAS_MAX: mensagem_jogo = "O tempo acabou! Vitória!"
+            if jogador.no_atual in graph.winning_nodes:
+                mensagem_jogo = "Você escapou! Vitória!"
+                Vitorias += 1
+            elif jogador.no_atual == perseguidor.no_atual: 
+                mensagem_jogo = "Você foi apanhado! Fim de jogo."
+                Vitorias = 0
+            elif rodada_atual >= RODADAS_MAX: 
+                mensagem_jogo = "O tempo acabou! Vitória!"
+                Vitorias += 1
             
             if turno == 'jogador' and jogador.custoMAX <= 0:
                 turno = 'perseguidor'
@@ -290,7 +301,7 @@ def main():
 
         TELA.fill(BRANCO)
         drawGraph(TELA, graph)
-        drawUI(TELA, jogador, perseguidor, turno, mensagem_jogo, rodada_atual)
+        drawUI(TELA, jogador, perseguidor, turno, mensagem_jogo, rodada_atual , Vitorias)
         jogador.personagenImagen(TELA)
         perseguidor.personagenImagen(TELA)
         
