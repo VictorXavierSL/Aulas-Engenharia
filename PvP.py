@@ -212,7 +212,7 @@ print("__________________")
 print("Mago 3")
 
 print("__________________")
-print("Arqueiro")
+print("Arqueiro 4")
 
 print("__________________")
 Escola1 = int(input("Jogador1: "))
