@@ -24,10 +24,10 @@ class BolsaDeValores:
     def add_observer(name: str, callback_method):
         if name not in BolsaDeValores._observadores:
             BolsaDeValores._observadores[name] = []
-        BolsaDeValores._observadores[name].append(callback_method)
+        BolsaDeValores._observadores[name].append(callback_method) #adiciona o sistema que deseja receber a notificacao
         
     @staticmethod
-    def post_notification(name: str, dados=None , varietion=None):
+    def post_notification(name: str, dados=None , varietion=None): #posta as notificacoes de valor atual da acao e da sua variacao de mercado
         if name in BolsaDeValores._observadores:
             for method in BolsaDeValores._observadores[name]:
                 method(dados, varietion)
@@ -35,8 +35,8 @@ class BolsaDeValores:
             
                 
 
-
-class SistemaDeAlertaBolsa:
+# construtor de dados notificados
+class SistemaDeAlertaBolsa: #define os dados que serao notificados 
     def __init__(self):
        for i in range(len(requestAPI())):
             valor_dict = requestAPI().iloc[i].to_dict()
@@ -46,32 +46,33 @@ class SistemaDeAlertaBolsa:
 
 
 class p_APIBolsa(Protocol):
-    def __init__(self , Nome , Nome_acao):
+    def __init__(self , Nome , Nome_acao): #Delegat que ira definir como os programas que se juntar a "API" deve ser 
         self.nome = Nome
         self.AcaoNome = Nome_acao
         self.AcaoValor = 0.0
-        
+        self.varietion = None
         BolsaDeValores.add_observer(Nome_acao , self.receberValor)
     def receberValor(self , AcaoValor , varietion ):
         ...
 
 
-class BrunoContabilidades:
+class BrunoContabilidades:                #sistema integrado a minha "API"
     def __init__(self, Nome, Nome_acao):
         self.AcaoNome = Nome_acao
-        self.AcaoValor = None
+        self.AcaoValor = 0.0
         self.Nome = Nome
         self.varietion = None
         BolsaDeValores.add_observer(self.AcaoNome , self.receberValor)
     def receberValor(self , AcaoValor , varietion):
         print(f"O sistema {self.Nome} recebeu o novo valor da {self.AcaoNome} de atualmete {AcaoValor}. sua variacao de mercado e {varietion}")
         self.AcaoValor = AcaoValor
+        self.varietion = varietion
+        
+class consultor(BrunoContabilidades):    #sistema Filho do BrunoContabilidades
+   def __init__(self, Nome, Nome_acao):
+       super().__init__(Nome, Nome_acao)
 
-class consultor(BrunoContabilidades):
-   
-   def receberValor(self , AcaoValor , varietion):
-        print(f"O sistema {self.Nome} recebeu o novo valor da {self.AcaoNome} de atualmete {AcaoValor}. sua variacao de mercado e {varietion} ")
-        self.AcaoValor = AcaoValor
+
 
 test = BrunoContabilidades(Nome= "BrunoContabilidade" , Nome_acao= "VALE3")
 test2 = consultor(Nome= "Victor" , Nome_acao="PETR4")
