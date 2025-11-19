@@ -25,19 +25,22 @@ class BolsaDeValores:
         if name not in BolsaDeValores._observadores:
             BolsaDeValores._observadores[name] = []
         BolsaDeValores._observadores[name].append(callback_method)
-
+        
     @staticmethod
-    def post_notification(name: str, dados=None):
+    def post_notification(name: str, dados=None , varietion=None):
         if name in BolsaDeValores._observadores:
             for method in BolsaDeValores._observadores[name]:
-                method(dados)
+                method(dados, varietion)
+                
+            
+                
 
 
 class SistemaDeAlertaBolsa:
-    def __init__(self, ):
+    def __init__(self):
        for i in range(len(requestAPI())):
             valor_dict = requestAPI().iloc[i].to_dict()
-            BolsaDeValores.post_notification(name= valor_dict['symbol'] , dados= valor_dict['regularMarketPrice'])
+            BolsaDeValores.post_notification(name= valor_dict['symbol'] , dados= valor_dict['regularMarketPrice'] , varietion=valor_dict['fiftyTwoWeekRange'])
         
 
 
@@ -49,7 +52,7 @@ class p_APIBolsa(Protocol):
         self.AcaoValor = 0.0
         
         BolsaDeValores.add_observer(Nome_acao , self.receberValor)
-    def receberValor(self , AcaoValor):
+    def receberValor(self , AcaoValor , varietion ):
         ...
 
 
@@ -58,15 +61,16 @@ class BrunoContabilidades:
         self.AcaoNome = Nome_acao
         self.AcaoValor = None
         self.Nome = Nome
+        self.varietion = None
         BolsaDeValores.add_observer(self.AcaoNome , self.receberValor)
-    def receberValor(self , AcaoValor):
-        print(f"O sistema {self.Nome} recebeu o novo valor da {self.AcaoNome} de atualmete {AcaoValor}")
+    def receberValor(self , AcaoValor , varietion):
+        print(f"O sistema {self.Nome} recebeu o novo valor da {self.AcaoNome} de atualmete {AcaoValor}. sua variacao de mercado e {varietion}")
         self.AcaoValor = AcaoValor
 
 class consultor(BrunoContabilidades):
    
-   def receberValor(self , AcaoValor):
-        print(f"O sistema {self.Nome} recebeu o novo valor da {self.AcaoNome} de atualmete {AcaoValor}")
+   def receberValor(self , AcaoValor , varietion):
+        print(f"O sistema {self.Nome} recebeu o novo valor da {self.AcaoNome} de atualmete {AcaoValor}. sua variacao de mercado e {varietion} ")
         self.AcaoValor = AcaoValor
 
 test = BrunoContabilidades(Nome= "BrunoContabilidade" , Nome_acao= "VALE3")
